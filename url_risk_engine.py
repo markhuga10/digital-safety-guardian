@@ -1,11 +1,12 @@
 URL_CATEGORY_SCORES = {
+    "invalid_scheme": 10,
+    "invalid_url": 0,
     "insecure_protocol": 15,
     "ip_address_host": 15,
     "embedded_credentials": 25,
     "suspicious_keyword": 10,
     "excessive_subdomains": 15,
     "lookalike_domain": 35,
-    "invalid_url": 0,
 }
 
 

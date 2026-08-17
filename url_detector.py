@@ -17,11 +17,13 @@ SUSPICIOUS_KEYWORDS = [
     "signin",
     "wallet",
     "recover",
+    "recovery",
     "support",
 ]
 
 
 def levenshtein_distance(a, b):
+    """Calculate the edit distance between two strings."""
 
     if len(a) < len(b):
         return levenshtein_distance(b, a)
@@ -52,6 +54,7 @@ def levenshtein_distance(a, b):
 
 
 def is_ip_address(hostname):
+    """Return True if hostname is a valid IP address."""
 
     try:
         ip_address(hostname)
@@ -62,13 +65,16 @@ def is_ip_address(hostname):
 
 
 def is_lookalike_domain(hostname):
+    """Detect domains that closely resemble trusted domains."""
 
     if not hostname:
         return None
 
-    hostname = hostname.lower()
+    hostname = hostname.lower().strip(".")
 
     for trusted_domain in TRUSTED_DOMAINS:
+
+        trusted_domain = trusted_domain.lower()
 
         if hostname == trusted_domain:
             continue
@@ -88,6 +94,7 @@ def is_lookalike_domain(hostname):
 
 
 def analyze_url(url):
+    """Analyze a URL for common phishing indicators."""
 
     findings = []
 
@@ -95,7 +102,6 @@ def analyze_url(url):
         parsed = urlparse(url)
 
     except Exception:
-
         return [
             {
                 "category": "invalid_url",
@@ -103,41 +109,37 @@ def analyze_url(url):
             }
         ]
 
-    if not parsed.scheme or not parsed.netloc:
+    # Validate scheme
+    if parsed.scheme.lower() not in ["http", "https"]:
 
-        return [
-            {
-                "category": "invalid_url",
-                "description": (
-                    "The URL is missing a valid scheme or hostname."
-                )
-            }
-        ]
+        findings.append({
+            "category": "invalid_scheme",
+            "description": "The URL does not use HTTP or HTTPS."
+        })
 
-    hostname = parsed.hostname
-
-    if not hostname:
-
-        return [
-            {
-                "category": "invalid_url",
-                "description": (
-                    "The URL does not contain a valid hostname."
-                )
-            }
-        ]
-
-    # Check protocol
+    # HTTP is not encrypted
     if parsed.scheme.lower() == "http":
 
         findings.append({
             "category": "insecure_protocol",
-            "description": (
-                "The URL uses HTTP instead of HTTPS."
-            )
+            "description": "The URL uses HTTP instead of HTTPS."
         })
 
-    # Check whether hostname is an IP address
+    # Validate hostname
+    hostname = parsed.hostname
+
+    if not hostname:
+
+        findings.append({
+            "category": "invalid_url",
+            "description": "The URL does not contain a valid hostname."
+        })
+
+        return findings
+
+    hostname = hostname.lower().strip(".")
+
+    # Detect IP address hosts
     if is_ip_address(hostname):
 
         findings.append({
@@ -147,7 +149,7 @@ def analyze_url(url):
             )
         })
 
-    # Check for embedded credentials
+    # Detect embedded credentials
     if parsed.username or parsed.password:
 
         findings.append({
@@ -157,14 +159,26 @@ def analyze_url(url):
             )
         })
 
-    # Check suspicious keywords
-    url_text = url.lower()
+    # Detect excessive subdomains
+    hostname_parts = hostname.split(".")
 
+    if len(hostname_parts) >= 5:
+
+        findings.append({
+            "category": "excessive_subdomains",
+            "description": (
+                "The hostname contains an unusually large number "
+                "of subdomains."
+            )
+        })
+
+    # Detect suspicious keywords
     for keyword in SUSPICIOUS_KEYWORDS:
 
         if re.search(
             r"\b" + re.escape(keyword) + r"\b",
-            url_text
+            url,
+            re.IGNORECASE
         ):
 
             findings.append({
@@ -178,20 +192,7 @@ def analyze_url(url):
 
             break
 
-    # Check excessive subdomains
-    hostname_parts = hostname.split(".")
-
-    if len(hostname_parts) >= 5:
-
-        findings.append({
-            "category": "excessive_subdomains",
-            "description": (
-                "The hostname contains an unusually large number "
-                "of subdomains."
-            )
-        })
-
-    # Check lookalike domain
+    # Detect lookalike domains
     lookalike = is_lookalike_domain(hostname)
 
     if lookalike:

@@ -3,18 +3,18 @@ from pydantic import BaseModel
 
 from detector import analyze_message
 from risk_engine import calculate_risk
-
 from recommendation_engine import generate_recommendations
-
 from url_detector import analyze_url
 from url_risk_engine import calculate_url_risk
-
 from combined_risk_engine import calculate_overall_risk
 
 
 app = FastAPI(
     title="Digital Safety Guardian",
-    description="A security analysis API for detecting social engineering and suspicious URLs.",
+    description=(
+        "A security analysis API for detecting social engineering "
+        "and suspicious URLs."
+    ),
     version="0.2.1"
 )
 
@@ -49,10 +49,16 @@ def analyze(request: AnalyzeRequest):
         message_findings
     )
 
-
     # -------------------------
     # URL analysis
     # -------------------------
+
+    url_findings = []
+
+    url_risk = {
+        "score": 0,
+        "level": "MINIMAL"
+    }
 
     if request.url:
 
@@ -62,18 +68,8 @@ def analyze(request: AnalyzeRequest):
             url_findings
         )
 
-    else:
-
-        url_findings = []
-
-        url_risk = {
-            "score": 0,
-            "level": "MINIMAL"
-        }
-
-
     # -------------------------
-    # Combined analysis
+    # Combined risk
     # -------------------------
 
     overall_risk = calculate_overall_risk(
@@ -81,13 +77,11 @@ def analyze(request: AnalyzeRequest):
         url_risk
     )
 
-
     # -------------------------
     # Final response
     # -------------------------
 
     return {
-
         "message_risk": {
             "score": message_risk["score"],
             "level": message_risk["level"],
@@ -100,7 +94,10 @@ def analyze(request: AnalyzeRequest):
             "findings": url_findings
         },
 
-        "overall_risk": overall_risk,
+        "overall_risk": {
+            "score": overall_risk["score"],
+            "level": overall_risk["level"]
+        },
 
         "explanations": recommendations[
             "explanations"
