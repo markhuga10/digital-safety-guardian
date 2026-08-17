@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from detector import analyze_message
 from risk_engine import calculate_risk
@@ -21,6 +22,7 @@ def analyze(message, url=None):
 
     # URL analysis
     url_findings = []
+
     url_risk = {
         "score": 0,
         "level": "MINIMAL"
@@ -28,7 +30,10 @@ def analyze(message, url=None):
 
     if url:
         url_findings = analyze_url(url)
-        url_risk = calculate_url_risk(url_findings)
+
+        url_risk = calculate_url_risk(
+            url_findings
+        )
 
     # Combined risk
     overall_risk = calculate_overall_risk(
@@ -175,6 +180,12 @@ def main():
         help="Optional URL to analyze"
     )
 
+    analyze_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output analysis as JSON"
+    )
+
     args = parser.parse_args()
 
     if args.command == "analyze":
@@ -184,7 +195,15 @@ def main():
             args.url
         )
 
-        print_report(result)
+        if args.json:
+            print(
+                json.dumps(
+                    result,
+                    indent=2
+                )
+            )
+        else:
+            print_report(result)
 
     else:
         parser.print_help()
