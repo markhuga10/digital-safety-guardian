@@ -155,3 +155,28 @@ def test_cli_json_output_with_url(capsys, monkeypatch):
     assert result["url_findings"][0]["category"] == (
         "insecure_protocol"
     )
+def test_cli_detects_credential_phishing_pattern():
+
+    result = analyze(
+        "URGENT! Verify your account immediately and send your OTP!"
+    )
+
+    assert "credential_phishing" in result["attack_patterns"]
+
+
+def test_cli_detects_payment_scam_pattern():
+
+    result = analyze(
+        "URGENT! Send money immediately to avoid account suspension."
+    )
+
+    assert "payment_scam" in result["attack_patterns"]
+
+
+def test_cli_returns_no_attack_pattern_for_benign_message():
+
+    result = analyze(
+        "Hello, how are you?"
+    )
+
+    assert result["attack_patterns"] == []

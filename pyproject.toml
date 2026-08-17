@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "digital-safety-guardian"
-version = "0.2.1"
-description = "A security analysis tool for detecting social engineering and suspicious URLs"
+version = "0.3.0"
+description = "A security analysis tool for detecting social engineering, suspicious URLs, and attack patterns"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi",
@@ -22,7 +22,8 @@ py-modules = [
     "url_detector",
     "url_risk_engine",
     "recommendation_engine",
-    "trusted_domains"
+    "trusted_domains",
+    "attack_pattern_engine"
 ]
 
 [project.scripts]
