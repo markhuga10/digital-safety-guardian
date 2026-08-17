@@ -4,15 +4,24 @@ from pydantic import BaseModel
 from detector import analyze_message
 from risk_engine import calculate_risk
 
+from recommendation_engine import generate_recommendations
+
+from url_detector import analyze_url
+from url_risk_engine import calculate_url_risk
+
+from combined_risk_engine import calculate_overall_risk
+
 
 app = FastAPI(
     title="Digital Safety Guardian",
-    version="0.1.0"
+    description="A security analysis API for detecting social engineering and suspicious URLs.",
+    version="0.2.1"
 )
 
 
-class MessageRequest(BaseModel):
+class AnalyzeRequest(BaseModel):
     message: str
+    url: str | None = None
 
 
 @app.get("/")
@@ -20,21 +29,88 @@ def home():
 
     return {
         "application": "Digital Safety Guardian",
-        "version": "0.1.0",
+        "version": "0.2.1",
         "status": "running"
     }
 
 
 @app.post("/analyze")
-def analyze(request: MessageRequest):
+def analyze(request: AnalyzeRequest):
 
-    findings = analyze_message(request.message)
+    # -------------------------
+    # Message analysis
+    # -------------------------
 
-    risk = calculate_risk(findings)
+    message_findings = analyze_message(request.message)
+
+    message_risk = calculate_risk(message_findings)
+
+    recommendations = generate_recommendations(
+        message_findings
+    )
+
+
+    # -------------------------
+    # URL analysis
+    # -------------------------
+
+    if request.url:
+
+        url_findings = analyze_url(request.url)
+
+        url_risk = calculate_url_risk(
+            url_findings
+        )
+
+    else:
+
+        url_findings = []
+
+        url_risk = {
+            "score": 0,
+            "level": "MINIMAL"
+        }
+
+
+    # -------------------------
+    # Combined analysis
+    # -------------------------
+
+    overall_risk = calculate_overall_risk(
+        message_risk,
+        url_risk
+    )
+
+
+    # -------------------------
+    # Final response
+    # -------------------------
 
     return {
-        "risk_score": risk["score"],
-        "risk_level": risk["level"],
-        "findings": findings,
-    }
 
+        "message_risk": {
+            "score": message_risk["score"],
+            "level": message_risk["level"],
+            "findings": message_findings
+        },
+
+        "url_risk": {
+            "score": url_risk["score"],
+            "level": url_risk["level"],
+            "findings": url_findings
+        },
+
+        "overall_risk": overall_risk,
+
+        "explanations": recommendations[
+            "explanations"
+        ],
+
+        "recommendations": recommendations[
+            "recommendations"
+        ],
+
+        "priority_actions": recommendations[
+            "priority_actions"
+        ]
+    }
