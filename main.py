@@ -1,9 +1,11 @@
 from urllib.parse import urlparse
+from pathlib import Path
 import ipaddress
 import re
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
 from cli import analyze as analyze_security
@@ -23,6 +25,9 @@ HOSTNAME_PATTERN = re.compile(
     r"[A-Za-z]{2,63}$"
 )
 
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+
 
 app = FastAPI(
     title="Digital Safety Guardian",
@@ -31,6 +36,13 @@ app = FastAPI(
         "suspicious URLs, and attack patterns."
     ),
     version="0.3.0",
+)
+
+
+app.mount(
+    "/static",
+    StaticFiles(directory=FRONTEND_DIR),
+    name="static",
 )
 
 
@@ -126,6 +138,16 @@ def home():
         "version": "0.3.0",
         "status": "running",
     }
+
+
+@app.get(
+    "/dashboard",
+    response_class=HTMLResponse,
+)
+def dashboard():
+    return FileResponse(
+        FRONTEND_DIR / "index.html"
+    )
 
 
 @app.post(

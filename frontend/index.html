@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Digital Safety Guardian</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<main class="container">
+
+    <header class="hero">
+        <div>
+            <p class="eyebrow">CYBERSECURITY ANALYSIS PLATFORM</p>
+            <h1>DIGITAL SAFETY GUARDIAN</h1>
+            <p class="subtitle">
+                Analyze suspicious messages and URLs for social-engineering,
+                phishing, scam, and impersonation indicators.
+            </p>
+        </div>
+    </header>
+
+    <section class="card">
+        <label for="message">Suspicious Message</label>
+
+        <textarea
+            id="message"
+            maxlength="5000"
+            placeholder="Paste the suspicious message here..."
+        ></textarea>
+
+        <div class="field-meta">
+            <span>Maximum 5,000 characters</span>
+            <span id="message-count">0 / 5000</span>
+        </div>
+
+        <label for="url">Optional URL</label>
+
+        <input
+            id="url"
+            type="url"
+            maxlength="2048"
+            placeholder="https://example.com"
+        >
+
+        <div
+            id="error"
+            class="error hidden"
+        ></div>
+
+        <button id="analyze-button">
+            ANALYZE
+        </button>
+    </section>
+
+    <section
+        id="results"
+        class="results hidden"
+    >
+
+        <div class="risk-card">
+            <p class="section-label">OVERALL RISK</p>
+            <div id="overall-score">--</div>
+            <div id="overall-level">--</div>
+        </div>
+
+        <div class="grid">
+
+            <div class="card">
+                <p class="section-label">MESSAGE RISK</p>
+                <h2 id="message-risk-score">--</h2>
+                <p id="message-risk-level">--</p>
+            </div>
+
+            <div class="card">
+                <p class="section-label">URL RISK</p>
+                <h2 id="url-risk-score">--</h2>
+                <p id="url-risk-level">--</p>
+            </div>
+
+        </div>
+
+        <div class="card">
+            <p class="section-label">ATTACK PATTERNS</p>
+            <div id="attack-patterns"></div>
+        </div>
+
+        <div class="card">
+            <p class="section-label">INDICATORS</p>
+            <div id="indicators"></div>
+        </div>
+
+        <div class="card">
+            <p class="section-label">EXPLANATIONS</p>
+            <div id="explanations"></div>
+        </div>
+
+        <div class="card">
+            <p class="section-label">RECOMMENDATIONS</p>
+            <div id="recommendations"></div>
+        </div>
+
+        <div class="card">
+            <p class="section-label">PRIORITY ACTIONS</p>
+            <div id="priority-actions"></div>
+        </div>
+
+    </section>
+
+</main>
+
+<script src="/static/app.js"></script>
+
+</body>
+</html>

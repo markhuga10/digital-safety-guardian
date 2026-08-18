@@ -1,0 +1,156 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+.container {
+    width: min(1100px, 92%);
+    margin: 0 auto;
+    padding: 40px 0 60px;
+}
+
+.hero {
+    margin-bottom: 30px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 40px;
+}
+
+.subtitle {
+    max-width: 760px;
+    color: #5b667a;
+    line-height: 1.6;
+}
+
+.card,
+.risk-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(23, 32, 51, 0.08);
+}
+
+label {
+    display: block;
+    font-weight: 700;
+    margin: 16px 0 8px;
+}
+
+textarea,
+input {
+    width: 100%;
+    border: 1px solid #ccd4e0;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+}
+
+textarea {
+    min-height: 180px;
+    resize: vertical;
+}
+
+.field-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #707b8e;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+button {
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    border: 0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #172033;
+    color: #ffffff;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.results {
+    margin-top: 30px;
+}
+
+.risk-card {
+    text-align: center;
+}
+
+#overall-score {
+    font-size: 56px;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+#overall-level {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.section-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #667085;
+}
+
+.result-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.result-item:last-child {
+    border-bottom: 0;
+}
+
+.error {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff0f0;
+    color: #9f2222;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+}
