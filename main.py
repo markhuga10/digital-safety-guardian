@@ -5,6 +5,9 @@ from cli import analyze as analyze_security
 from models import AnalysisResult
 
 
+MAX_MESSAGE_LENGTH = 5000
+
+
 app = FastAPI(
     title="Digital Safety Guardian",
     description=(
@@ -16,7 +19,11 @@ app = FastAPI(
 
 
 class AnalyzeRequest(BaseModel):
-    message: str = Field(min_length=1)
+    message: str = Field(
+        min_length=1,
+        max_length=MAX_MESSAGE_LENGTH,
+    )
+
     url: str | None = None
 
     @field_validator("message")
@@ -44,7 +51,6 @@ def home():
     response_model=AnalysisResult,
 )
 def analyze(request: AnalyzeRequest):
-
     return analyze_security(
         request.message,
         request.url,
