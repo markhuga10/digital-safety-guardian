@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from cli import analyze as analyze_security
+from models import AnalysisResult
 
 
 app = FastAPI(
@@ -28,7 +29,10 @@ def home():
     }
 
 
-@app.post("/analyze")
+@app.post(
+    "/analyze",
+    response_model=AnalysisResult,
+)
 def analyze(request: AnalyzeRequest):
 
     return analyze_security(

@@ -7,6 +7,7 @@ client = TestClient(app)
 
 
 def test_analyze_rejects_missing_message():
+
     response = client.post(
         "/analyze",
         json={}
@@ -16,6 +17,7 @@ def test_analyze_rejects_missing_message():
 
 
 def test_analyze_rejects_non_string_message():
+
     response = client.post(
         "/analyze",
         json={
@@ -27,6 +29,7 @@ def test_analyze_rejects_non_string_message():
 
 
 def test_analyze_accepts_optional_url():
+
     response = client.post(
         "/analyze",
         json={
@@ -44,6 +47,7 @@ def test_analyze_accepts_optional_url():
 
 
 def test_analyze_returns_structured_response():
+
     response = client.post(
         "/analyze",
         json={
@@ -66,3 +70,33 @@ def test_analyze_returns_structured_response():
 
     assert isinstance(data["attack_patterns"], list)
     assert isinstance(data["recommendations"], dict)
+
+
+def test_analyze_declares_analysis_result_response_model():
+
+    route = next(
+        route
+        for route in app.routes
+        if getattr(route, "path", None) == "/analyze"
+        and "POST" in getattr(route, "methods", set())
+    )
+
+    assert route.response_model is not None
+
+    assert route.response_model.__name__ == "AnalysisResult"
+
+
+def test_openapi_declares_analysis_result_schema():
+
+    schema = app.openapi()
+
+    response_schema = (
+        schema["paths"]["/analyze"]["post"]
+        ["responses"]["200"]
+        ["content"]["application/json"]
+        ["schema"]
+    )
+
+    assert response_schema == {
+        "$ref": "#/components/schemas/AnalysisResult"
+    }
