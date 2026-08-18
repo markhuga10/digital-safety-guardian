@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from cli import analyze as analyze_security
 from models import AnalysisResult
@@ -16,8 +16,18 @@ app = FastAPI(
 
 
 class AnalyzeRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1)
     url: str | None = None
+
+    @field_validator("message")
+    @classmethod
+    def validate_message(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError(
+                "Message must contain at least one non-whitespace character."
+            )
+
+        return value
 
 
 @app.get("/")
