@@ -36,6 +36,19 @@ class AnalyzeRequest(BaseModel):
 
         return value
 
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        if not value.strip():
+            raise ValueError(
+                "URL must not be empty or whitespace-only."
+            )
+
+        return value
+
 
 @app.get("/")
 def home():
