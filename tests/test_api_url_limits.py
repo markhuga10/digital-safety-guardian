@@ -8,7 +8,7 @@ client = TestClient(app)
 
 def test_accepts_url_at_maximum_length():
 
-    url = "https://" + ("a" * 2040)
+    url = "https://example.com/" + ("a" * 2028)
 
     response = client.post(
         "/analyze",
@@ -18,12 +18,13 @@ def test_accepts_url_at_maximum_length():
         },
     )
 
+    assert len(url) == 2048
     assert response.status_code == 200
 
 
 def test_rejects_url_above_maximum_length():
 
-    url = "https://" + ("a" * 2041)
+    url = "https://example.com/" + ("a" * 2029)
 
     response = client.post(
         "/analyze",
@@ -33,6 +34,7 @@ def test_rejects_url_above_maximum_length():
         },
     )
 
+    assert len(url) == 2049
     assert response.status_code == 422
 
 
