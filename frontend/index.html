@@ -1,119 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>Digital Safety Guardian</title>
-    <link rel="stylesheet" href="/static/style.css">
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="Digital Safety Guardian cybersecurity analysis platform">
+
+<title>
+Digital Safety Guardian
+</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
 </head>
+
+
 <body>
 
-<main class="container">
 
-    <header class="hero">
-        <div>
-            <p class="eyebrow">CYBERSECURITY ANALYSIS PLATFORM</p>
-            <h1>DIGITAL SAFETY GUARDIAN</h1>
-            <p class="subtitle">
-                Analyze suspicious messages and URLs for social-engineering,
-                phishing, scam, and impersonation indicators.
-            </p>
-        </div>
-    </header>
+<div class="app-shell">
 
-    <section class="card">
-        <label for="message">Suspicious Message</label>
 
-        <textarea
-            id="message"
-            maxlength="5000"
-            placeholder="Paste the suspicious message here..."
-        ></textarea>
+<header class="topbar">
 
-        <div class="field-meta">
-            <span>Maximum 5,000 characters</span>
-            <span id="message-count">0 / 5000</span>
-        </div>
 
-        <label for="url">Optional URL</label>
+<div class="brand">
 
-        <input
-            id="url"
-            type="url"
-            maxlength="2048"
-            placeholder="https://example.com"
-        >
+<div class="brand-mark">
+DSG
+</div>
 
-        <div
-            id="error"
-            class="error hidden"
-        ></div>
 
-        <button id="analyze-button">
-            ANALYZE
-        </button>
-    </section>
+<div>
 
-    <section
-        id="results"
-        class="results hidden"
-    >
+<div class="brand-name">
+DIGITAL SAFETY GUARDIAN
+</div>
 
-        <div class="risk-card">
-            <p class="section-label">OVERALL RISK</p>
-            <div id="overall-score">--</div>
-            <div id="overall-level">--</div>
-        </div>
 
-        <div class="grid">
+<div class="brand-subtitle">
+Cybersecurity Analysis Platform
+</div>
 
-            <div class="card">
-                <p class="section-label">MESSAGE RISK</p>
-                <h2 id="message-risk-score">--</h2>
-                <p id="message-risk-level">--</p>
-            </div>
 
-            <div class="card">
-                <p class="section-label">URL RISK</p>
-                <h2 id="url-risk-score">--</h2>
-                <p id="url-risk-level">--</p>
-            </div>
+</div>
 
-        </div>
+</div>
 
-        <div class="card">
-            <p class="section-label">ATTACK PATTERNS</p>
-            <div id="attack-patterns"></div>
-        </div>
 
-        <div class="card">
-            <p class="section-label">INDICATORS</p>
-            <div id="indicators"></div>
-        </div>
 
-        <div class="card">
-            <p class="section-label">EXPLANATIONS</p>
-            <div id="explanations"></div>
-        </div>
+<div class="status-pill">
 
-        <div class="card">
-            <p class="section-label">RECOMMENDATIONS</p>
-            <div id="recommendations"></div>
-        </div>
+<span class="status-dot"></span>
 
-        <div class="card">
-            <p class="section-label">PRIORITY ACTIONS</p>
-            <div id="priority-actions"></div>
-        </div>
+ONLINE
 
-    </section>
+</div>
+
+
+</header>
+
+
+
+
+
+<main class="dashboard">
+
+
+<section class="hero-panel">
+
+
+<div class="hero-copy">
+
+
+<p class="eyebrow">
+DIGITAL SAFETY CHECK
+</p>
+
+
+<h1>
+Is this message safe?
+</h1>
+
+
+<p>
+Paste a suspicious message or website link.
+DSG checks for phishing, scams,
+impersonation and social engineering.
+</p>
+
+
+</div>
+
+
+
+
+
+<section class="card">
+
+
+<h2>
+What DSG looks for
+</h2>
+
+
+<ul>
+
+<li>
+Suspicious messages
+</li>
+
+<li>
+Phishing attempts
+</li>
+
+<li>
+Scam indicators
+</li>
+
+<li>
+Malicious URLs
+</li>
+
+</ul>
+
+
+</section>
+
+
+
+
+
+
+<section class="card">
+
+
+<h2>
+Security Analysis Input
+</h2>
+
+
+<label>
+Suspicious Message
+</label>
+
+
+<textarea
+id="message-input"
+placeholder="Paste suspicious message here">
+</textarea>
+
+
+
+<label>
+Optional URL
+</label>
+
+
+<input
+id="url-input"
+type="url"
+placeholder="https://example.com"
+>
+
+
+
+<button
+id="analyze-button"
+type="button">
+
+ANALYZE THREAT
+
+</button>
+
+
+
+<button
+id="reset-button"
+type="button">
+
+NEW ANALYSIS
+
+</button>
+
+
+</section>
+
+
+
+
+
+
+
+<section class="results">
+
+
+
+<article class="card">
+
+
+<h2>
+OVERALL RISK
+</h2>
+
+
+<div id="overall-risk"></div>
+
+
+</article>
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+MESSAGE RISK
+</h2>
+
+
+<div id="message-risk"></div>
+
+
+</article>
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+URL RISK
+</h2>
+
+
+<div id="url-risk"></div>
+
+
+</article>
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+ATTACK PATTERNS
+</h2>
+
+
+<div id="attack-patterns"></div>
+
+
+</article>
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+INDICATORS
+</h2>
+
+
+<div id="indicators"></div>
+
+
+</article>
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+EXPLANATIONS
+</h2>
+
+
+<div id="explanations"></div>
+
+
+</article>
+
+
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+RECOMMENDATIONS
+</h2>
+
+
+<div id="recommendations"></div>
+
+
+</article>
+
+
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+RECOMMENDED RESPONSE
+</h2>
+
+
+<p>
+Recommended response: Follow the safety guidance provided after analysis.
+</p>
+
+
+</article>
+
+
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+What to do next
+</h2>
+
+
+<p>
+Review the security recommendations carefully before clicking links, sharing information, or taking action.
+</p>
+
+
+<ul>
+
+<li>
+Verify the sender identity
+</li>
+
+
+<li>
+Avoid suspicious links
+</li>
+
+
+<li>
+Report suspicious activity
+</li>
+
+
+</ul>
+
+
+</article>
+
+
+
+
+
+
+
+<article class="card">
+
+
+<h2>
+PRIORITY ACTIONS
+</h2>
+
+
+<div id="priority-actions"></div>
+
+
+</article>
+
+
+
+
+
+</section>
+
+
+
+
+</section>
+
 
 </main>
 
+
+
+
+
+
+
+<footer class="footer">
+
+
+<div>
+DIGITAL SAFETY GUARDIAN
+</div>
+
+
+<div>
+Security awareness for everyone
+</div>
+
+
+</footer>
+
+
+
+
+
+</div>
+
+
+
+
 <script src="/static/app.js"></script>
 
+
 </body>
+
+
 </html>
