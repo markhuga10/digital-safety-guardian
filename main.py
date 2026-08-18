@@ -2,7 +2,8 @@ from urllib.parse import urlparse
 import ipaddress
 import re
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
 from cli import analyze as analyze_security
@@ -88,20 +89,34 @@ class AnalyzeRequest(BaseModel):
                 "URL must contain a valid host."
             )
 
-        # Allow valid IPv4 and IPv6 addresses.
         try:
             ipaddress.ip_address(hostname)
             return value
         except ValueError:
             pass
 
-        # Reject malformed domain names.
         if not HOSTNAME_PATTERN.fullmatch(hostname):
             raise ValueError(
                 "URL must contain a valid hostname."
             )
 
         return value
+
+
+@app.exception_handler(Exception)
+async def internal_error_handler(
+    request: Request,
+    exc: Exception,
+):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": (
+                "An internal error occurred "
+                "while processing the request."
+            )
+        },
+    )
 
 
 @app.get("/")
