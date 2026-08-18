@@ -9,6 +9,8 @@ from url_risk_engine import calculate_url_risk
 from combined_risk_engine import calculate_overall_risk
 from attack_pattern_engine import classify_attack_patterns
 
+from models import AnalysisResult
+
 
 def analyze(message, url=None):
     """
@@ -43,14 +45,6 @@ def analyze(message, url=None):
     attack_pattern_result = classify_attack_patterns(
         message_findings
     )
-
-    # The attack-pattern engine returns:
-    #
-    # {
-    #     "patterns": [...]
-    # }
-    #
-    # The CLI exposes the patterns directly as a list.
 
     attack_patterns = attack_pattern_result.get(
         "patterns",
@@ -88,18 +82,24 @@ def analyze(message, url=None):
     )
 
     # ---------------------------------------------------------
-    # Final result
+    # Validate complete result with Pydantic
     # ---------------------------------------------------------
 
-    return {
-        "message_findings": message_findings,
-        "message_risk": message_risk,
-        "url_findings": url_findings,
-        "url_risk": url_risk,
-        "overall_risk": overall_risk,
-        "attack_patterns": attack_patterns,
-        "recommendations": recommendations,
-    }
+    validated_result = AnalysisResult(
+        message_findings=message_findings,
+        message_risk=message_risk,
+        url_findings=url_findings,
+        url_risk=url_risk,
+        overall_risk=overall_risk,
+        attack_patterns=attack_patterns,
+        recommendations=recommendations,
+    )
+
+    # ---------------------------------------------------------
+    # Return dictionary for backwards compatibility
+    # ---------------------------------------------------------
+
+    return validated_result.model_dump()
 
 
 def print_report(result):

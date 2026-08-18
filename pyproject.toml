@@ -23,7 +23,8 @@ py-modules = [
     "url_risk_engine",
     "recommendation_engine",
     "trusted_domains",
-    "attack_pattern_engine"
+    "attack_pattern_engine",
+    "models"
 ]
 
 [project.scripts]
