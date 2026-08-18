@@ -1,4 +1,6 @@
 from urllib.parse import urlparse
+import ipaddress
+import re
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field, field_validator
@@ -11,6 +13,14 @@ MAX_MESSAGE_LENGTH = 5000
 MAX_URL_LENGTH = 2048
 
 ALLOWED_URL_SCHEMES = {"http", "https"}
+
+HOSTNAME_PATTERN = re.compile(
+    r"^(?=.{1,253}$)"
+    r"(?:[A-Za-z0-9]"
+    r"(?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
+    r"\.)+"
+    r"[A-Za-z]{2,63}$"
+)
 
 
 app = FastAPI(
@@ -69,6 +79,26 @@ class AnalyzeRequest(BaseModel):
         if not parsed.netloc:
             raise ValueError(
                 "URL must contain a valid host."
+            )
+
+        hostname = parsed.hostname
+
+        if not hostname:
+            raise ValueError(
+                "URL must contain a valid host."
+            )
+
+        # Allow valid IPv4 and IPv6 addresses.
+        try:
+            ipaddress.ip_address(hostname)
+            return value
+        except ValueError:
+            pass
+
+        # Reject malformed domain names.
+        if not HOSTNAME_PATTERN.fullmatch(hostname):
+            raise ValueError(
+                "URL must contain a valid hostname."
             )
 
         return value
