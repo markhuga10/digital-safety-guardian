@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from fastapi import FastAPI
 from pydantic import BaseModel, Field, field_validator
 
@@ -6,6 +8,7 @@ from models import AnalysisResult
 
 
 MAX_MESSAGE_LENGTH = 5000
+ALLOWED_URL_SCHEMES = {"http", "https"}
 
 
 app = FastAPI(
@@ -42,9 +45,23 @@ class AnalyzeRequest(BaseModel):
         if value is None:
             return None
 
-        if not value.strip():
+        value = value.strip()
+
+        if not value:
             raise ValueError(
                 "URL must not be empty or whitespace-only."
+            )
+
+        parsed = urlparse(value)
+
+        if parsed.scheme.lower() not in ALLOWED_URL_SCHEMES:
+            raise ValueError(
+                "URL must use HTTP or HTTPS."
+            )
+
+        if not parsed.netloc:
+            raise ValueError(
+                "URL must contain a valid host."
             )
 
         return value
