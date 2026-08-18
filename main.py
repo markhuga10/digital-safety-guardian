@@ -8,6 +8,8 @@ from models import AnalysisResult
 
 
 MAX_MESSAGE_LENGTH = 5000
+MAX_URL_LENGTH = 2048
+
 ALLOWED_URL_SCHEMES = {"http", "https"}
 
 
@@ -50,6 +52,11 @@ class AnalyzeRequest(BaseModel):
         if not value:
             raise ValueError(
                 "URL must not be empty or whitespace-only."
+            )
+
+        if len(value) > MAX_URL_LENGTH:
+            raise ValueError(
+                f"URL must not exceed {MAX_URL_LENGTH} characters."
             )
 
         parsed = urlparse(value)
