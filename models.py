@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import List
 
+from checkam_ng.threat_intelligence import ThreatIntelligence
+
 
 class Finding(BaseModel):
     category: str
@@ -20,6 +22,14 @@ class Recommendations(BaseModel):
 
 
 class AnalysisResult(BaseModel):
+    """
+    Complete CheckAm-NG analysis result.
+
+    Preserves the original Digital Safety Guardian
+    analysis fields while adding fraud classification
+    and structured threat intelligence.
+    """
+
     message_findings: List[Finding]
     message_risk: RiskAssessment
 
@@ -29,5 +39,9 @@ class AnalysisResult(BaseModel):
     overall_risk: RiskAssessment
 
     attack_patterns: List[str]
+
+    fraud_category: str = "unknown"
+
+    threat_intelligence: ThreatIntelligence | None = None
 
     recommendations: Recommendations

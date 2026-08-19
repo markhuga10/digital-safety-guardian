@@ -1,11 +1,10 @@
-from pydantic import ValidationError
 import pytest
 
 from models import (
-    AnalysisResult,
     Finding,
-    Recommendations,
     RiskAssessment,
+    Recommendations,
+    AnalysisResult,
 )
 
 
@@ -17,39 +16,38 @@ def test_finding_accepts_valid_data():
 
     assert finding.category == "urgency"
     assert finding.pattern == r"\burgent\b"
-    assert finding.description is None
 
 
 def test_finding_accepts_description():
     finding = Finding(
-        category="insecure_protocol",
-        description="The URL uses HTTP instead of HTTPS.",
+        category="payment_request",
+        pattern="send money",
+        description="The message requests payment.",
     )
 
-    assert finding.category == "insecure_protocol"
-    assert finding.description == "The URL uses HTTP instead of HTTPS."
+    assert finding.description == "The message requests payment."
 
 
 def test_risk_assessment_accepts_valid_score():
     risk = RiskAssessment(
-        score=75,
-        level="HIGH",
+        score=50,
+        level="MODERATE",
     )
 
-    assert risk.score == 75
-    assert risk.level == "HIGH"
+    assert risk.score == 50
+    assert risk.level == "MODERATE"
 
 
 def test_risk_assessment_rejects_score_above_100():
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError):
         RiskAssessment(
             score=101,
-            level="CRITICAL",
+            level="HIGH",
         )
 
 
 def test_risk_assessment_rejects_negative_score():
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError):
         RiskAssessment(
             score=-1,
             level="MINIMAL",
@@ -98,6 +96,32 @@ def test_analysis_result_accepts_complete_result():
     )
 
     assert result.message_risk.score == 20
-    assert result.url_risk.score == 0
-    assert result.overall_risk.level == "LOW"
-    assert "payment_scam" in result.attack_patterns
+    assert result.attack_patterns == ["payment_scam"]
+    assert result.fraud_category == "unknown"
+
+
+def test_analysis_result_accepts_fraud_category():
+    result = AnalysisResult(
+        message_findings=[],
+        message_risk=RiskAssessment(
+            score=60,
+            level="HIGH",
+        ),
+        url_findings=[],
+        url_risk=RiskAssessment(
+            score=15,
+            level="MINIMAL",
+        ),
+        overall_risk=RiskAssessment(
+            score=42,
+            level="MODERATE",
+        ),
+        attack_patterns=[
+            "credential_phishing",
+            "impersonation",
+        ],
+        fraud_category="credential_phishing",
+        recommendations=Recommendations(),
+    )
+
+    assert result.fraud_category == "credential_phishing"

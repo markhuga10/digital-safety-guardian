@@ -9,6 +9,11 @@ from url_risk_engine import calculate_url_risk
 from combined_risk_engine import calculate_overall_risk
 from attack_pattern_engine import classify_attack_patterns
 
+from checkam_ng.fraud_classifier import classify_fraud
+from checkam_ng.threat_intelligence_engine import (
+    generate_threat_intelligence,
+)
+
 from models import AnalysisResult
 
 
@@ -17,7 +22,7 @@ def analyze(message, url=None):
     Analyze a message and optional URL.
 
     Returns:
-        dict: Complete Digital Safety Guardian analysis result.
+        dict: Complete CheckAm-NG analysis result.
     """
 
     # ---------------------------------------------------------
@@ -28,6 +33,36 @@ def analyze(message, url=None):
 
     message_risk = calculate_risk(
         message_findings
+    )
+
+    # ---------------------------------------------------------
+    # URL analysis
+    # ---------------------------------------------------------
+
+    url_findings = []
+
+    url_risk = {
+        "score": 0,
+        "level": "MINIMAL",
+    }
+
+    if url:
+
+        url_findings = analyze_url(
+            url
+        )
+
+        url_risk = calculate_url_risk(
+            url_findings
+        )
+
+    # ---------------------------------------------------------
+    # Combined risk
+    # ---------------------------------------------------------
+
+    overall_risk = calculate_overall_risk(
+        message_risk,
+        url_risk,
     )
 
     # ---------------------------------------------------------
@@ -52,33 +87,34 @@ def analyze(message, url=None):
     )
 
     # ---------------------------------------------------------
-    # URL analysis
+    # Fraud classification
     # ---------------------------------------------------------
 
-    url_findings = []
-
-    url_risk = {
-        "score": 0,
-        "level": "MINIMAL"
-    }
-
-    if url:
-
-        url_findings = analyze_url(
-            url
-        )
-
-        url_risk = calculate_url_risk(
-            url_findings
-        )
+    fraud_category = classify_fraud(
+        message_findings=message_findings,
+        url_findings=url_findings,
+        message=message,
+    )
 
     # ---------------------------------------------------------
-    # Combined risk
+    # Convert FraudCategory enum to string
     # ---------------------------------------------------------
 
-    overall_risk = calculate_overall_risk(
-        message_risk,
-        url_risk
+    fraud_category_value = (
+        fraud_category.value
+        if hasattr(fraud_category, "value")
+        else str(fraud_category)
+    )
+
+    # ---------------------------------------------------------
+    # Threat intelligence
+    # ---------------------------------------------------------
+
+    threat_intelligence = generate_threat_intelligence(
+        message_findings=message_findings,
+        url_findings=url_findings,
+        fraud_category=fraud_category,
+        message=message,
     )
 
     # ---------------------------------------------------------
@@ -92,11 +128,13 @@ def analyze(message, url=None):
         url_risk=url_risk,
         overall_risk=overall_risk,
         attack_patterns=attack_patterns,
+        fraud_category=fraud_category_value,
+        threat_intelligence=threat_intelligence,
         recommendations=recommendations,
     )
 
     # ---------------------------------------------------------
-    # Return dictionary for backwards compatibility
+    # Return dictionary
     # ---------------------------------------------------------
 
     return validated_result.model_dump()
@@ -186,6 +224,78 @@ def print_report(result):
     )
 
     # ---------------------------------------------------------
+    # Fraud classification
+    # ---------------------------------------------------------
+
+    print()
+    print("FRAUD CLASSIFICATION")
+    print("-" * 60)
+
+    print(
+        f"Category: {result['fraud_category']}"
+    )
+
+    # ---------------------------------------------------------
+    # Threat intelligence
+    # ---------------------------------------------------------
+
+    intelligence = result.get(
+        "threat_intelligence"
+    )
+
+    if intelligence:
+
+        print()
+        print("THREAT INTELLIGENCE")
+        print("-" * 60)
+
+        print(
+            f"Impersonated Entity: "
+            f"{intelligence['impersonated_entity']}"
+        )
+
+        print(
+            f"Fraud Type: "
+            f"{intelligence['fraud_type']}"
+        )
+
+        print(
+            f"Target: "
+            f"{intelligence['target']}"
+        )
+
+        print(
+            f"Communication Channel: "
+            f"{intelligence['communication_channel']}"
+        )
+
+        print(
+            f"Requested Action: "
+            f"{intelligence['requested_action']}"
+        )
+
+        print(
+            f"Likely Impact: "
+            f"{intelligence['likely_impact']}"
+        )
+
+        print(
+            f"Confidence: "
+            f"{intelligence['confidence']}"
+        )
+
+        if intelligence["evidence"]:
+
+            print()
+            print("Evidence:")
+
+            for evidence in intelligence["evidence"]:
+
+                print(
+                    f"  [!] {evidence}"
+                )
+
+    # ---------------------------------------------------------
     # Attack patterns
     # ---------------------------------------------------------
 
@@ -258,7 +368,7 @@ def main():
         description=(
             "Digital Safety Guardian - "
             "message and URL security analysis"
-        )
+        ),
     )
 
     subparsers = parser.add_subparsers(
@@ -267,23 +377,23 @@ def main():
 
     analyze_parser = subparsers.add_parser(
         "analyze",
-        help="Analyze a message and optional URL"
+        help="Analyze a message and optional URL",
     )
 
     analyze_parser.add_argument(
         "message",
-        help="Message to analyze"
+        help="Message to analyze",
     )
 
     analyze_parser.add_argument(
         "--url",
-        help="Optional URL to analyze"
+        help="Optional URL to analyze",
     )
 
     analyze_parser.add_argument(
         "--json",
         action="store_true",
-        help="Output analysis as JSON"
+        help="Output analysis as JSON",
     )
 
     args = parser.parse_args()
@@ -292,7 +402,7 @@ def main():
 
         result = analyze(
             args.message,
-            args.url
+            args.url,
         )
 
         if args.json:
@@ -300,7 +410,7 @@ def main():
             print(
                 json.dumps(
                     result,
-                    indent=2
+                    indent=2,
                 )
             )
 
